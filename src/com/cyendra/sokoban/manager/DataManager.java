@@ -52,7 +52,7 @@ public class DataManager {
 	}
 	public Image[] getPic(){
 		Image pic[] = new Image[14];
-		for (int i=0;i<13;i++){
+		for (int i=0;i<=13;i++){
 			File f = new File("images\\pic"+i+".JPG");
 			try {
 				pic[i] = ImageIO.read(f);
@@ -68,6 +68,8 @@ public class DataManager {
 		return maxLevel;
 	}
 	public Map createMap(int level){
+		if (level < 0) level = 0;
+		if (level >= maxLevel) level = maxLevel - 1;
 		Map mp = new Map(getMap(level),level);
 		return mp;
 	}

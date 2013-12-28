@@ -9,6 +9,14 @@ public class GameManager {
 	private final int direct[][] = { {-1,0},{0,1},{1,0},{0,-1} };
 	public final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 	private Map map;
+	private boolean gameOn = true;
+	public boolean canMove(){
+		return gameOn;
+	}
+	public void setGame(boolean ok){
+		gameOn = ok;
+	}
+	
 	public Map getMap(){
 		return map;
 	}
@@ -45,7 +53,7 @@ public class GameManager {
 	public boolean isWin(){
 		for (int i=0;i<map.getMap().length;i++){
 			for (int j=0;j<map.getMap()[0].length;j++){
-				if (map.getMap(i, j)==END) return false;
+				if (map.getMap(i, j)==END||map.getMap(i, j)>=10&&map.getMap(i, j)<=13) return false;
 			}
 		}
 		return true;

@@ -16,11 +16,13 @@ import javax.swing.JFrame;
 
 import com.cyendra.sokoban.manager.DataManager;
 import com.cyendra.sokoban.manager.GameManager;
+import com.cyendra.sokoban.manager.SoundManager;
 
 public class GameFrame extends JFrame implements ActionListener, MouseListener, KeyListener {
 	
-	GameManager gm;
-	DataManager dm;
+	private GameManager gm;
+	private DataManager dm;
+	private SoundManager sm;
 	
 	private String title = "推箱子";
 	private int leftX = 0, leftY = 0;
@@ -34,6 +36,7 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	public void init(){
 		dm = new DataManager();
 		gm = new GameManager();
+		sm = new SoundManager();
 		gm.init(dm.createMap(0));
 		this.setTitle(title);
 		this.setSize(600,600);
@@ -52,6 +55,8 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		this.addKeyListener(this);
 		this.addMouseListener(this);
 		this.addMouseListener(this);
+		
+		sm.loadSound();
 	}
 	
 	private void getMapSizeAndPosition(){
@@ -63,6 +68,7 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	}
 	
 	public void paint(Graphics g){
+		super.paint(g);
 		for (int i=0;i<mapRow;i++){
 			for (int j=0;j<mapColumn;j++){
 				byte tp = gm.getMap().getMap(i, j);
@@ -76,11 +82,21 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		g.drawString("现在是第", 150, 140);
 		g.drawString(String.valueOf(gm.getMap().getLevel()+1), 310, 140);
 		g.drawString("关", 360, 140);
+		if (!gm.canMove()) g.drawString("按回车键进入下一关", 150, 180);
 	}
 	
 	//----接口--------------------------------------------------------
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if (!gm.canMove()) {
+			if (e.getKeyCode()==KeyEvent.VK_ENTER){
+				gm.init(dm.createMap(gm.getMap().getLevel()+1));
+				gm.setGame(true);
+				getMapSizeAndPosition();
+				repaint();
+			}
+			return;
+		}
 		switch (e.getKeyCode()){
 		case KeyEvent.VK_UP:
 			gm.manMoveTo(gm.UP);
@@ -96,6 +112,7 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 			break;
 		}
 		repaint();
+		if (gm.isWin()) gm.setGame(false);
 	}
 
 	@Override
