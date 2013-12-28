@@ -41,7 +41,7 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		dm = new DataManager();
 		gm = new GameManager();
 		sm = new SoundManager();
-		gm.init(dm.createMap(0));
+		//gm.init(dm.createMap(0));
 		this.setTitle(title);
 		this.setSize(600,600);
 		this.setLocation(300, 20);
@@ -53,8 +53,11 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		width = this.getWidth();
 		height = this.getHeight();
 		this.setFocusable(true);
+		
 		//initMap();
-		getMapSizeAndPosition();
+		//getMapSizeAndPosition();
+		
+		newGame(0);
 		
 		this.addKeyListener(this);
 		this.addMouseListener(this);
@@ -122,19 +125,24 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	
 	}
 	*/
+	
+	private void newGame(int level){
+		gm.init(dm.createMap(level));
+		gm.setGame(true);
+		getMapSizeAndPosition();
+		repaint();
+	}
+	
 	//----½Ó¿Ú--------------------------------------------------------
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (!gm.canMove()) {
-			if (e.getKeyCode()==KeyEvent.VK_ENTER){
-				gm.init(dm.createMap(gm.getMap().getLevel()+1));
-				gm.setGame(true);
-				getMapSizeAndPosition();
-				repaint();
-			}
-			return;
-		}
 		switch (e.getKeyCode()){
+		case KeyEvent.VK_ENTER:
+			if (!gm.canMove()) newGame(gm.getMap().getLevel()+1);
+			break;
+		case KeyEvent.VK_R:
+			newGame(gm.getMap().getLevel());
+			break;
 		case KeyEvent.VK_UP:
 			gm.manMoveTo(gm.UP);
 			break;

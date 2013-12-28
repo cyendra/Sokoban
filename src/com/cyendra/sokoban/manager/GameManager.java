@@ -28,6 +28,7 @@ public class GameManager {
 		this.map = map;
 	}
 	public boolean manMoveTo(int dir){
+		if (!canMove()) return false;
 		int dx = map.getManX()+direct[dir][0];
 		int dy = map.getMaxY()+direct[dir][1];
 		if (!map.inMap(dx, dy)) return false;
