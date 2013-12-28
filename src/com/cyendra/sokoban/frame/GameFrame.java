@@ -24,6 +24,10 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	private DataManager dm;
 	private SoundManager sm;
 	
+	//双缓冲
+	private Image iBuffer;
+	private Graphics gBuffer;
+	
 	private String title = "推箱子";
 	private int leftX = 0, leftY = 0;
 	private int width = 0, height = 0;
@@ -44,7 +48,7 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container cont = this.getContentPane();
 		cont.setLayout(null);
-		cont.setBackground(Color.black);
+		//cont.setBackground(Color.black);
 		pic = dm.getPic();
 		width = this.getWidth();
 		height = this.getHeight();
@@ -68,6 +72,38 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	}
 	
 	public void paint(Graphics g){
+		if (iBuffer == null){
+			iBuffer = createImage(this.getSize().width, this.getSize().height);
+			gBuffer = iBuffer.getGraphics();
+		}
+		
+		gBuffer.setColor(getBackground());
+		gBuffer.fillRect(0, 0, this.getSize().width, this.getSize().height);
+		
+		for (int i=0;i<mapRow;i++){
+			for (int j=0;j<mapColumn;j++){
+				byte tp = gm.getMap().getMap(i, j);
+				if (tp>0){
+					gBuffer.drawImage(pic[tp], leftX+j*30, leftY+i*30, this);
+				}
+			}
+		}
+		gBuffer.setColor(Color.red);
+		gBuffer.setFont(new Font("楷体_2312", Font.BOLD, 30));
+		gBuffer.drawString("现在是第", 150, 140);
+		gBuffer.drawString(String.valueOf(gm.getMap().getLevel()+1), 310, 140);
+		gBuffer.drawString("关", 360, 140);
+		if (!gm.canMove()) gBuffer.drawString("按回车键进入下一关", 150, 180);
+		
+		g.drawImage(iBuffer,0,0,this);
+		
+	}
+	public void update(Graphics g){
+		paint(g);
+	}
+	
+	/*
+	public void paint(Graphics g){
 		super.paint(g);
 		for (int i=0;i<mapRow;i++){
 			for (int j=0;j<mapColumn;j++){
@@ -83,8 +119,9 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		g.drawString(String.valueOf(gm.getMap().getLevel()+1), 310, 140);
 		g.drawString("关", 360, 140);
 		if (!gm.canMove()) g.drawString("按回车键进入下一关", 150, 180);
-	}
 	
+	}
+	*/
 	//----接口--------------------------------------------------------
 	@Override
 	public void keyPressed(KeyEvent e) {
