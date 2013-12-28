@@ -2,31 +2,28 @@ package com.cyendra.sokoban.manager;
 
 import com.cyendra.sokoban.Map;
 
+/**
+ * 管理游戏内容与逻辑的类
+ * @author cyendra
+ * @version 1.0
+ * */
 public class GameManager {
-	public final byte WALL = 1, BOX = 2, BOX_ON_END = 3, END = 4, 
-			MAN_DOWN = 5, MAN_LEFT = 6, MAN_RIGHT = 7, MAN_UP = 8, GRASS = 9, 
-			MAN_DOWN_ON_END = 10, MAN_LEFT_ON_END = 11,MAN_RIGHT_ON_END = 12, MAN_UP_ON_END = 13;
-	private final int direct[][] = { {-1,0},{0,1},{1,0},{0,-1} };
-	public final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
-	private Map map;
-	private boolean gameOn = true;
-	public boolean canMove(){
-		return gameOn;
-	}
-	public void setGame(boolean ok){
-		gameOn = ok;
-	}
-	
-	public Map getMap(){
-		return map;
-	}
+
+	public final static int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;// 方向映射
+
+	private final int direct[][] = { {-1,0}, {0,1}, {1,0}, {0,-1} };// 方向常量	
+	private Map map;// 地图类
+	private boolean gameOn = true;// 游戏是否可操作
+
+	/** 构造函数 */
 	public GameManager(){}
-	public GameManager(Map map) {
-		init(map);
-	}
+
+	/** 初始化游戏为地图map */
 	public void init(Map map){
 		this.map = map;
 	}
+	
+	/** 向dir方向移动主角 */
 	public boolean manMoveTo(int dir){
 		if (!canMove()) return false;
 		int dx = map.getManX()+direct[dir][0];
@@ -50,67 +47,88 @@ public class GameManager {
 		return true;
 	}
 	
-	/** 判断是否胜利 */
-	public boolean isWin(){
-		for (int i=0;i<map.getMap().length;i++){
-			for (int j=0;j<map.getMap()[0].length;j++){
-				if (map.getMap(i, j)==END||map.getMap(i, j)>=10&&map.getMap(i, j)<=13) return false;
-			}
-		}
-		return true;
-	}
-	
-	private void BoxIn(int x, int y) {
-		byte tp = map.getMap(x,y);
-		if (tp == GRASS) map.setMap(x, y, BOX);
-		if (tp == END) map.setMap(x, y, BOX_ON_END);
-	}
+	// 箱子离开(x,y)
 	private void BoxOut(int x, int y) {
 		byte tp = map.getMap(x,y);
-		if (tp == BOX) map.setMap(x, y, GRASS);
-		if (tp == BOX_ON_END) map.setMap(x, y, END);
+		if (tp == Map.BOX) map.setMap(x, y, Map.GRASS);
+		if (tp == Map.BOX_ON_END) map.setMap(x, y, Map.END);
 	}
-	//角色离开此地
+	
+	// 箱子进入(x,y)
+	private void BoxIn(int x, int y) {
+		byte tp = map.getMap(x,y);
+		if (tp == Map.GRASS) map.setMap(x, y, Map.BOX);
+		if (tp == Map.END) map.setMap(x, y, Map.BOX_ON_END);
+	}
+	
+	//角色离开此地(x,y)
 	private void manOut(int x,int y){
 		byte tp = map.getMap(x, y);
-		if (tp>=5 && tp<=8) map.setMap(x, y, GRASS);
-		if (tp>=10 && tp<=13) map.setMap(x, y, END);
+		if (tp>=5 && tp<=8) map.setMap(x, y, Map.GRASS);
+		if (tp>=10 && tp<=13) map.setMap(x, y, Map.END);
 	}
-	//角色以dir方向进入此地
+	
+	//角色以dir方向进入此地(x,y)
 	private void manIn(int x,int y,int dir){
 		byte tp = map.getMap(x, y);
-		if (tp == END) {
+		if (tp == Map.END) {
 			switch(dir){
 			case UP:
-				map.setMap(x, y, MAN_UP_ON_END);
+				map.setMap(x, y, Map.MAN_UP_ON_END);
 				break;
 			case RIGHT:
-				map.setMap(x, y, MAN_RIGHT_ON_END);
+				map.setMap(x, y, Map.MAN_RIGHT_ON_END);
 				break;
 			case DOWN:
-				map.setMap(x, y, MAN_DOWN_ON_END);
+				map.setMap(x, y, Map.MAN_DOWN_ON_END);
 				break;
 			case LEFT:
-				map.setMap(x, y, MAN_LEFT_ON_END);
+				map.setMap(x, y, Map.MAN_LEFT_ON_END);
 				break;
 			}
 		}
-		if (tp == GRASS){
+		if (tp == Map.GRASS){
 			switch(dir){
 			case UP:
-				map.setMap(x, y, MAN_UP);
+				map.setMap(x, y, Map.MAN_UP);
 				break;
 			case RIGHT:
-				map.setMap(x, y, MAN_RIGHT);
+				map.setMap(x, y, Map.MAN_RIGHT);
 				break;
 			case DOWN:
-				map.setMap(x, y, MAN_DOWN);
+				map.setMap(x, y, Map.MAN_DOWN);
 				break;
 			case LEFT:
-				map.setMap(x, y, MAN_LEFT);
+				map.setMap(x, y, Map.MAN_LEFT);
 				break;
 			}
 		}
 		map.setMan(x, y);
 	}
+	
+	/** 判断是否胜利 */
+	public boolean isWin(){
+		for (int i=0;i<map.getRow();i++){
+			for (int j=0;j<map.getColumn();j++){
+				if (map.getMap(i, j)==Map.END||map.getMap(i, j)>=10&&map.getMap(i, j)<=13) return false;
+			}
+		}
+		return true;
+	}
+	
+	/** 获取游戏是否可操作 */
+	public boolean canMove(){
+		return gameOn;
+	}
+	
+	/** 设置游戏是否可操作 */
+	public void setGame(boolean ok){
+		gameOn = ok;
+	}
+	
+	/** 获取地图类 */
+	public Map getMap(){
+		return map;
+	}
+	
 }

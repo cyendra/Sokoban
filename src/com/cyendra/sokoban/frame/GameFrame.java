@@ -20,60 +20,69 @@ import com.cyendra.sokoban.manager.SoundManager;
 
 public class GameFrame extends JFrame implements ActionListener, MouseListener, KeyListener {
 	
+	private static final long serialVersionUID = 1L;
+	
+	// 管理器
 	private GameManager gm;
 	private DataManager dm;
 	private SoundManager sm;
 	
-	//双缓冲
+	// 双缓冲技术
 	private Image iBuffer;
 	private Graphics gBuffer;
 	
+	// 窗体信息
 	private String title = "推箱子";
 	private int leftX = 0, leftY = 0;
 	private int width = 0, height = 0;
 	private int mapRow = 0, mapColumn = 0;
+	
+	// 贴图数据
 	private Image pic[] = null;
 	
+	/** 构造一个游戏窗体 */
 	public GameFrame() {
 		init();
 	}
+	
+	/** 初始化窗体 */
 	public void init(){
 		dm = new DataManager();
 		gm = new GameManager();
 		sm = new SoundManager();
-		//gm.init(dm.createMap(0));
+		
 		this.setTitle(title);
 		this.setSize(600,600);
 		this.setLocation(300, 20);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Container cont = this.getContentPane();
-		cont.setLayout(null);
-		//cont.setBackground(Color.black);
-		pic = dm.getPic();
-		width = this.getWidth();
-		height = this.getHeight();
 		this.setFocusable(true);
 		
-		//initMap();
-		//getMapSizeAndPosition();
+		Container cont = this.getContentPane();
+		cont.setLayout(null);
+
+		pic = dm.getPic();
+		sm.loadSound();
 		
-		newGame(0);
+		width = this.getWidth();
+		height = this.getHeight();
 		
 		this.addKeyListener(this);
 		this.addMouseListener(this);
 		this.addMouseListener(this);
 		
-		sm.loadSound();
+		newGame(0);
 	}
 	
+	// 更新地图信息与贴图位置
 	private void getMapSizeAndPosition(){
 		mapRow = gm.getMap().getRow();
 		mapColumn = gm.getMap().getColumn();
 		leftX = (width - mapColumn * 30) / 2;
-		leftY = (width - mapRow * 30) / 2;
-		System.out.println(leftX+" "+leftY+" "+mapRow+" "+mapColumn);
+		leftY = (height - mapRow * 30) / 2;
+		System.out.println("左上坐标: "+leftX+" "+leftY+" 行列数: "+mapRow+" "+mapColumn);
 	}
 	
+	// 双缓冲技术重载paint
 	public void paint(Graphics g){
 		if (iBuffer == null){
 			iBuffer = createImage(this.getSize().width, this.getSize().height);
@@ -93,39 +102,23 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		}
 		gBuffer.setColor(Color.red);
 		gBuffer.setFont(new Font("楷体_2312", Font.BOLD, 30));
-		gBuffer.drawString("现在是第", 150, 140);
-		gBuffer.drawString(String.valueOf(gm.getMap().getLevel()+1), 310, 140);
-		gBuffer.drawString("关", 360, 140);
-		if (!gm.canMove()) gBuffer.drawString("按回车键进入下一关", 150, 180);
-		
+		gBuffer.drawString("按R键重新开始本关", 100, 60);
+		gBuffer.drawString("现在是第", 100, 100);
+		gBuffer.drawString(String.valueOf(gm.getMap().getLevel()+1), 260, 100);
+		gBuffer.drawString("关", 310, 100);
+		if (!gm.canMove()) {
+			if (dm.getMaxLevel()-1==gm.getMap().getLevel()) gBuffer.drawString("恭喜你通关了! 按回车键退出游戏!", 100, 140);
+			else gBuffer.drawString("按回车键进入下一关", 100, 140);
+		}
 		g.drawImage(iBuffer,0,0,this);
-		
 	}
+	
+	// 重载update
 	public void update(Graphics g){
 		paint(g);
 	}
 	
-	/*
-	public void paint(Graphics g){
-		super.paint(g);
-		for (int i=0;i<mapRow;i++){
-			for (int j=0;j<mapColumn;j++){
-				byte tp = gm.getMap().getMap(i, j);
-				if (tp>0){
-					g.drawImage(pic[tp], leftX+j*30, leftY+i*30, this);
-				}
-			}
-		}
-		g.setColor(Color.red);
-		g.setFont(new Font("楷体_2312", Font.BOLD, 30));
-		g.drawString("现在是第", 150, 140);
-		g.drawString(String.valueOf(gm.getMap().getLevel()+1), 310, 140);
-		g.drawString("关", 360, 140);
-		if (!gm.canMove()) g.drawString("按回车键进入下一关", 150, 180);
-	
-	}
-	*/
-	
+	// 从第level关开始新游戏
 	private void newGame(int level){
 		gm.init(dm.createMap(level));
 		gm.setGame(true);
@@ -138,22 +131,25 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()){
 		case KeyEvent.VK_ENTER:
-			if (!gm.canMove()) newGame(gm.getMap().getLevel()+1);
+			if (!gm.canMove()){
+				if (dm.getMaxLevel()-1==gm.getMap().getLevel()) System.exit(0);
+				else newGame(gm.getMap().getLevel()+1);
+			}
 			break;
 		case KeyEvent.VK_R:
 			newGame(gm.getMap().getLevel());
 			break;
 		case KeyEvent.VK_UP:
-			gm.manMoveTo(gm.UP);
+			gm.manMoveTo(GameManager.UP);
 			break;
 		case KeyEvent.VK_DOWN:
-			gm.manMoveTo(gm.DOWN);
+			gm.manMoveTo(GameManager.DOWN);
 			break;
 		case KeyEvent.VK_LEFT:
-			gm.manMoveTo(gm.LEFT);
+			gm.manMoveTo(GameManager.LEFT);
 			break;
 		case KeyEvent.VK_RIGHT:
-			gm.manMoveTo(gm.RIGHT);
+			gm.manMoveTo(GameManager.RIGHT);
 			break;
 		}
 		repaint();
@@ -161,51 +157,27 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyReleased(KeyEvent e) {}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyTyped(KeyEvent e) {}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseClicked(MouseEvent e) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseReleased(MouseEvent e) {}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void actionPerformed(ActionEvent e) {}
 
 }

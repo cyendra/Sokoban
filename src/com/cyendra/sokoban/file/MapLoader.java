@@ -2,10 +2,15 @@ package com.cyendra.sokoban.file;
 
 import java.io.File;
 import java.util.Scanner;
+
 /**
  * 读取地图资源文件的类
+ * @author cyendra
+ * @version 1.0
  * */
 public class MapLoader {
+	
+	/** 读取文件中的地图数据 */
 	public static byte[][][] loadMap(){
 		byte[][][] map = null;
 		File file = new File("data/map.mp");
@@ -37,4 +42,5 @@ public class MapLoader {
 		}
 		return map;
 	}
+	
 }
