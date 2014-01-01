@@ -34,6 +34,7 @@ public class SoundManager {
 		sign = true;
 	}
 	
+	/*
 	public void bgmStop(){
 		midi.stop();
 		midi.close();
@@ -47,5 +48,6 @@ public class SoundManager {
 	void setMusic(String e){
 		file = e;
 	}
+	*/
 	
 }

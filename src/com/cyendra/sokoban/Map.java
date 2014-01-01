@@ -99,11 +99,6 @@ public class Map {
 		return level;
 	}
 	
-	/** 检测地图合法性 */
-	public boolean isGoodMap(){
-		return true;
-	}
-	
 	/** 判断(i,j)是否为空地 */
 	public boolean isGrassOrEnd(int i,int j){
 		if (map[i][j]==4||map[i][j]==9) return true;
@@ -122,4 +117,8 @@ public class Map {
 		return false;
 	}
 	
+	/** 检测地图合法性 */
+	public boolean isGoodMap(){
+		return true;
+	}
 }

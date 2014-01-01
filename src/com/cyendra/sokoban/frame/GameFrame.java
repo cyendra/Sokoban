@@ -18,7 +18,7 @@ import com.cyendra.sokoban.manager.DataManager;
 import com.cyendra.sokoban.manager.GameManager;
 import com.cyendra.sokoban.manager.SoundManager;
 
-public class GameFrame extends JFrame implements ActionListener, MouseListener, KeyListener {
+public class GameFrame extends JFrame implements KeyListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -57,9 +57,6 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setFocusable(true);
 		
-		Container cont = this.getContentPane();
-		cont.setLayout(null);
-
 		pic = dm.getPic();
 		sm.loadSound();
 		
@@ -67,11 +64,12 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 		height = this.getHeight();
 		
 		this.addKeyListener(this);
-		this.addMouseListener(this);
-		this.addMouseListener(this);
 		
 		newGame(0);
 	}
+	
+	//Container cont = this.getContentPane();
+	//cont.setLayout(null);
 	
 	// 更新地图信息与贴图位置
 	private void getMapSizeAndPosition(){
@@ -161,23 +159,5 @@ public class GameFrame extends JFrame implements ActionListener, MouseListener, 
 
 	@Override
 	public void keyTyped(KeyEvent e) {}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public void mousePressed(MouseEvent e) {}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {}
 
 }

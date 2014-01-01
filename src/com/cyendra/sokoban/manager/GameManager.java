@@ -9,9 +9,9 @@ import com.cyendra.sokoban.Map;
  * */
 public class GameManager {
 
-	public final static int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;// 方向映射
-
-	private final int direct[][] = { {-1,0}, {0,1}, {1,0}, {0,-1} };// 方向常量	
+	public final static int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;// 方向
+	private final int direct[][] = { {-1,0}, {0,1}, {1,0}, {0,-1} };// 方向常量
+	
 	private Map map;// 地图类
 	private boolean gameOn = true;// 游戏是否可操作
 
